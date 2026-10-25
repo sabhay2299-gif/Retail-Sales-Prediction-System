@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Machine Learning Models</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<header>
+    <h1>Machine Learning Models</h1>
+    <p>Retail Sales Prediction Engine</p>
+</header>
+
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/inventory">Inventory</a>
+    <a href="/models">ML Models</a>
+    <a href="/upload">Upload Dataset</a>
+</nav>
+
+<main>
+
+    <section class="cards">
+
+        <div class="card">
+            <h3>Random Forest</h3>
+            <p>Uses multiple decision trees to predict sales.</p>
+            <p>Status: Implemented</p>
+        </div>
+
+        <div class="card">
+            <h3>Linear Regression</h3>
+            <p>Models a linear relationship between features and sales.</p>
+            <p>Status: Future Enhancement</p>
+        </div>
+
+        <div class="card">
+            <h3>Time-Series Forecasting</h3>
+            <p>Forecasts future sales using historical sales over time.</p>
+            <p>Status: Future Enhancement</p>
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RetailIQ | Sales Intelligence</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg: #0b1020;
+            --card: #121a2d;
+            --border: #27324a;
+            --text: #f1f5ff;
+            --muted: #8b97b2;
+            --purple: #9b8cff;
+            --blue: #69a8ff;
+            --green: #5ee0b5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        button, input, select {
+            font: inherit;
+        }
+
+        button, a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .layout {
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 28px 18px;
+            background: #0d1324;
+            border-right: 1px solid #202a40;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            transition: transform .25s ease;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 38px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #a08bff, #5e5be8);
+            box-shadow: 0 8px 30px #7160f044;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .brand h2 {
+            font: 800 22px 'Manrope', sans-serif;
+            letter-spacing: -1px;
+        }
+
+        .brand h2 span {
+            color: var(--purple);
+        }
+
+        .brand small {
+            color: #8190ad;
+            display: block;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            margin-top: 2px;
+        }
+
+        .nav-heading {
+            color: #64718e;
+            font-size: 10px;
+            letter-spacing: 1.6px;
+            font-weight: 700;
+            padding: 0 12px 12px;
+        }
+
+        .nav {
+            display: grid;
+            gap: 7px;
+        }
+
+        .nav a {
+            padding: 13px 14px;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            border-radius: 10px;
+            color: #9ba7c0;
+            font-size: 13px;
+            transition: .2s;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: linear-gradient(90deg, #7867ef30, #7867ef08);
+            color: white;
+        }
+
+        .nav a.active {
+            box-shadow: inset 3px 0 var(--purple);
+        }
+
+        .nav-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 19px;
+            color: var(--purple);
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .sidebar-note {
+            padding: 17px;
+            background: linear-gradient(145deg, #1c2340, #151c30);
+            border: 1px solid #303957;
+            border-radius: 13px;
+            margin-bottom: 18px;
+        }
+
+        .sidebar-note .star {
+            color: #b6a9ff;
+            font-size: 23px;
+        }
+
+        .sidebar-note h4 {
+            margin-top: 9px;
+            font-size: 12px;
+        }
+
+        .sidebar-note p {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .sidebar-footer {
+            padding: 15px 5px 0;
+            border-top: 1px solid #252e43;
+            color: #8996b0;
+            font-size: 11px;
+        }
+
+        /* MAIN */
+
+        .main {
+            margin-left: 250px;
+            padding: 0 34px;
+            max-width: 1900px;
+        }
+
+        .topbar {
+            height: 76px;
+            border-bottom: 1px solid #202a40;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .breadcrumb {
+            color: #8190ad;
+            font-size: 12px;
+        }
+
+        .breadcrumb strong {
+            color: white;
+            font-weight: 600;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 17px;
+        }
+
+        .system-status {
+            color: #a6b4cd;
+            font-size: 11px;
+        }
+
+        .system-status i {
+            width: 7px;
+            height: 7px;
+            display: inline-block;
+            border-radius: 50%;
+            background: var(--green);
+            margin-right: 7px;
+            box-shadow: 0 0 12px #5ee0b555;
+        }
+
+        .export-button {
+            padding: 9px 13px;
+            background: #182139;
+            color: white;
+            border: 1px solid #303b55;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .export-button:hover {
+            border-color: var(--purple);
+        }
+
+        .mobile-menu {
+            display: none;
+            background: #182139;
+            color: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 11px;
+            cursor: pointer;
+        }
+
+        /* PAGE HEADING */
+
+        .page-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 35px 0 27px;
+        }
+
+        .eyebrow {
+            font-size: 10px;
+            letter-spacing: 1.6px;
+            color: var(--purple);
+            font-weight: 700;
+        }
+
+        .page-heading h1 {
+            font: 800 clamp(25px, 3vw, 35px)/1.3 'Manrope', sans-serif;
+            letter-spacing: -1.3px;
+            margin: 12px 0 8px;
+        }
+
+        .page-heading h1 span {
+            background: linear-gradient(90deg, #a99aff, #72b1ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .date-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 12px 15px;
+            min-width: 180px;
+        }
+
+        .date-box small {
+            display: block;
+            font-size: 9px;
+            letter-spacing: 1px;
+            color: var(--muted);
+        }
+
+        .date-box strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        /* KPI CARDS */
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .kpi {
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+            padding: 20px;
+            min-height: 165px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            background: linear-gradient(145deg, #151e33, #101729);
+            transition: transform .2s, border-color .2s;
+        }
+
+        .kpi:hover {
+            transform: translateY(-3px);
+            border-color: #55517d;
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: #a3afc7;
+        }
+
+        .kpi-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+        }
+
+        .icon-purple {
+            color: #b0a1ff;
+            background: #8e7cff20;
+        }
+
+        .icon-blue {
+            color: #7db6ff;
+            background: #5e9dff20;
+        }
+
+        .icon-green {
+            color: #5ee0b5;
+            background: #50d6c21b;
+        }
+
+        .icon-orange {
+            color: #ffc779;
+            background: #f5bd691b;
+        }
+
+        .kpi-value {
+            font: 800 clamp(22px, 2vw, 29px)/1.4 'Manrope', sans-serif;
+            letter-spacing: -1px;
+            margin-top: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .kpi-description {
+            font-size: 10px;
+            color: #8190ad;
+            margin-top: 7px;
+        }
+
+        .positive {
+            color: var(--green);
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .sparkline {
+            position: absolute;
+            right: 13px;
+            bottom: 0;
+            height: 30px;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            opacity: .5;
+        }
+
+        .sparkline span {
+            width: 5px;
+            height: 40%;
+            border-radius: 3px 3px 0 0;
+            background: var(--purple);
+        }
+
+        .sparkline span:nth-child(2n) {
+            height: 75%;
+        }
+
+        .sparkline span:nth-child(3n) {
+            height: 100%;
+        }
+
+        .sparkline.blue span {
+            background: var(--blue);
+        }
+
+        /* PANELS */
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.7fr) minmax(270px, 1fr);
+            gap: 17px;
+            margin-top: 19px;
+        }
+
+        .panel {
+            min-width: 0;
+            background: linear-gradient(145deg, #131b2e, #101729);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 23px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .section-label {
+            color: #9b8cff;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        .panel h2 {
+            font: 700 18px 'Manrope', sans-serif;
+            letter-spacing: -.5px;
+            margin: 6px 0;
+        }
+
+        .panel-subtitle {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .chart-select {
+            background: #171f34;
+            color: #c2cce0;
+            border: 1px solid #303b55;
+            padding: 9px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 10px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 18px;
+            margin: 24px 0 10px;
+            color: #a3afc7;
+            font-size: 10px;
+        }
+
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .legend i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            background: var(--purple);
+        }
+
+        .legend .green-dot {
+            background: var(--green);
+        }
+
+        .chart-area {
+            position: relative;
+            height: 270px;
+            width: 100%;
+        }
+
+        .chart-footer {
+            border-top: 1px solid #252e44;
+            margin-top: 15px;
+            padding-top: 13px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 10px;
+            color: #8190ad;
+        }
+
+        /* INSIGHTS */
+
+        .insight-tag {
+            color: #b4a6ff;
+            background: #8e7cff20;
+            border: 1px solid #6559a74d;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 10px;
+        }
+
+        .insight-feature {
+            display: flex;
+            gap: 12px;
+            padding: 16px 13px;
+            margin: 22px 0 12px;
+            border: 1px solid #514b893d;
+            background: linear-gradient(120deg, #7869e71a, #3d4b7620);
+            border-radius: 11px;
+        }
+
+        .insight-symbol {
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: #8b7bff24;
+            color: #b1a4ff;
+        }
+
+        .insight-feature strong,
+        .insight-row strong {
+            font-size: 11px;
+        }
+
+        .insight-feature p,
+        .insight-row p {
+            font-size: 10px;
+            color: #8794ae;
+            line-height: 1.7;
+            margin-top: 5px;
+        }
+
+        .insight-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            padding: 14px 0;
+            border-bottom: 1px solid #252e44;
+        }
+
+        .insight-row .insight-symbol {
+            background: #1c2540;
+        }
+
+        .insight-row > div:nth-child(2) {
+            flex: 1;
+        }
+
+        .text-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #b0a4ff;
+            font-size: 11px;
+            font-weight: 700;
+            padding-top: 18px;
+        }
+
+        /* PREDICTION FORM */
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.7fr) minmax(270px, 1fr);
+            gap: 17px;
+            margin-top: 17px;
+        }
+
+        .model-badge {
+            white-space: nowrap;
+            color: #8ce5d1;
+            background: #1d2b35;
+            border: 1px solid #2b4a4b;
+            border-radius: 20px;
+            padding: 6px 10px;
+            font-size: 9px;
+        }
+
+        .model-badge i {
+            width: 5px;
+            height: 5px;
+            display: inline-block;
+            background: var(--green);
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px 13px;
+            margin-top: 24px;
+        }
+
+        .field label {
+            display: block;
+            color: #a6b2c9;
+            font-size: 10px;
+            margin-bottom: 8px;
+        }
+
+        .input-box {
+            height: 43px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 0 12px;
+            border: 1px solid #2c3852;
+            border-radius: 8px;
+            background: #0d1425;
+            transition: .2s;
+        }
+
+        .input-box:focus-within {
+            border-color: #8070f0;
+            box-shadow: 0 0 0 3px #8070f01a;
+        }
+
+        .input-box > span {
+            color: #a99aff;
+            font-size: 12px;
+        }
+
+        .input-box input,
+        .input-box select {
+            width: 100%;
+            min-width: 0;
+            color: #e7edfc;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            font-size: 12px;
+        }
+
+        .input-box select option {
+            background: #11182b;
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 13px;
+            margin-top: 2px;
+        }
+
+        .primary-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 8px;
+            background: linear-gradient(100deg, #7766e8, #615de0);
+            color: white;
+            font-weight: 700;
+            font-size: 11px;
+            box-shadow: 0 7px 20px #5e52df2a;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .primary-button:hover {
+            filter: brightness(1.12);
+            transform: translateY(-1px);
+        }
+
+        .form-note {
+            color: #7886a2;
+            font-size: 9px;
+        }
+
+        .result-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding: 14px;
+            min-height: 65px;
+            border-radius: 10px;
+            border: 1px solid #2b3851;
+            background: #0d1425;
+        }
+
+        .result-icon {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: #7868f022;
+            color: #b3a5ff;
+        }
+
+        .result-box small {
+            display: block;
+            color: #8391ad;
+            font-size: 8px;
+            letter-spacing: 1.2px;
+        }
+
+        .result-box strong {
+            display: block;
+            color: #e9eeff;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .result-box.error {
+            border-color: #79444e;
+        }
+
+        .result-box.error strong {
+            color: #ff9aa7;
+        }
+
+        /* DATASET PANEL */
+
+        .dataset-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 16px 0;
+            border-bottom: 1px solid #252e44;
+        }
+
+        .dataset-row small {
+            display: block;
+            color: #7e8ba7;
+            font-size: 10px;
+        }
+
+        .dataset-row strong {
+            display: block;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .status-pill {
+            color: #69d7c5;
+            background: #1b2d33;
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .upload-box {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+            padding: 15px;
+            background: #171f34;
+            border: 1px dashed #35415d;
+            border-radius: 10px;
+        }
+
+        .upload-icon {
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: #7969ed20;
+            color: #b3a5ff;
+            font-size: 18px;
+        }
+
+        .upload-box strong {
+            font-size: 11px;
+        }
+
+        .upload-box p {
+            font-size: 10px;
+            line-height: 1.7;
+            color: #8794ae;
+            margin: 5px 0 8px;
+        }
+
+        .upload-box a {
+            font-size: 10px;
+            color: #b0a4ff;
+            font-weight: 700;
+        }
+
+        .secondary-button {
+            width: 100%;
+            margin-top: 14px;
+            padding: 11px;
+            border: 1px solid #303b55;
+            border-radius: 8px;
+            background: #151d31;
+            color: #b8c4dc;
+            font-size: 10px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .secondary-button:hover {
+            border-color: var(--purple);
+            color: white;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 23px 2px;
+            margin-top: 10px;
+            color: #64718e;
+            font-size: 10px;
+        }
+
+        .footer strong {
+            color: #a99aff;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1250px) {
+            .main {
+                padding: 0 22px;
+            }
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .content-grid,
+            .bottom-grid {
+                grid-template-columns: minmax(0, 1.4fr) minmax(250px, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 20px 0 50px #0008;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 0 18px;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .content-grid,
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .date-box {
+                display: none;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .main {
+                padding: 0 12px;
+            }
+
+            .topbar {
+                height: 65px;
+            }
+
+            .system-status {
+                display: none;
+            }
+
+            .page-heading {
+                padding: 26px 0 21px;
+            }
+
+            .page-heading h1 {
+                font-size: 26px;
+            }
+
+            .kpi-grid {
+                gap: 10px;
+            }
+
+            .kpi {
+                padding: 14px;
+                min-height: 145px;
+            }
+
+            .kpi-value {
+                font-size: 22px;
+            }
+
+            .panel {
+                padding: 17px;
+            }
+
+            .panel h2 {
+                font-size: 16px;
+            }
+
+            .chart-area {
+                height: 225px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer {
+                flex-direction: column;
+            }
+
+            .top-actions {
+                gap: 8px;
+            }
+
+            .export-button {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <a href="/" class="brand">
+            <div class="brand-icon">↗</div>
+            <div>
+                <h2>Retail<span>IQ</span></h2>
+                <small>SALES INTELLIGENCE</small>
+            </div>
+        </a>
+
+        <div class="nav-heading">WORKSPACE</div>
+
+        <nav class="nav">
+            <a href="#overview" class="active">
+                <span class="nav-icon">▦</span> Overview
+            </a>
+
+            <a href="#forecast">
+                <span class="nav-icon">⌁</span> Sales Analytics
+            </a>
+
+            <a href="#prediction">
+                <span class="nav-icon">✳</span> Sales Prediction
+            </a>
+
+            <a href="/inventory">
+                <span class="nav-icon">▤</span> Inventory
+            </a>
+
+            <a href="/upload">
+                <span class="nav-icon">⇧</span> Import Dataset
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-note">
+                <div class="star">✦</div>
+                <h4>Smarter retail decisions</h4>
+                <p>Turn sales data into insights and make better business decisions.</p>
+            </div>
+
+            <div class="sidebar-footer">
+                <span>●</span> Dashboard is ready
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <header class="topbar">
+
+            <div style="display:flex;align-items:center;gap:12px">
+                <button class="mobile-menu" id="menuButton">☰</button>
+
+                <div class="breadcrumb">
+                    Workspace &nbsp;/&nbsp;
+                    <strong>Overview</strong>
+                </div>
+            </div>
+
+            <div class="top-actions">
+
+                <span class="system-status">
+                    <i></i> System operational
+                </span>
+
+                <button class="export-button" id="exportButton">
+                    ⇩ Export
+                </button>
+
+            </div>
+
+        </header>
+
+        <!-- HEADING -->
+        <section class="page-heading" id="overview">
+
+            <div>
+                <div class="eyebrow">RETAIL PERFORMANCE CENTER</div>
+
+                <h1>
+                    Understand your sales.<br>
+                    <span>Predict what comes next.</span>
+                </h1>
+
+                <p>
+                    Monitor performance, analyze trends, and estimate future sales
+                    from your retail data.
+                </p>
+            </div>
+
+            <div class="date-box">
+                <small>REPORTING PERIOD</small>
+                <strong id="reportDate">Current Overview</strong>
+            </div>
+
+        </section>
+
+        <!-- KPI CARDS -->
+        <section class="kpi-grid">
+
+            <article class="kpi">
+                <div class="kpi-top">
+                    <span class="kpi-label">Total Sales Revenue</span>
+                    <span class="kpi-icon icon-purple">₹</span>
+                </div>
+
+                <div class="kpi-value" id="totalSales">₹0</div>
+
+                <div class="kpi-description">
+                    Revenue from available sales records
+                </div>
+
+                <div class="sparkline">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span>
+                </div>
+            </article>
+
+            <article class="kpi">
+                <div class="kpi-top">
+                    <span class="kpi-label">Average Sale Value</span>
+                    <span class="kpi-icon icon-blue">↗</span>
+                </div>
+
+                <div class="kpi-value" id="averageSales">₹0</div>
+
+                <div class="kpi-description">
+                    Average revenue per sales record
+                </div>
+
+                <div class="sparkline blue">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span>
+                </div>
+            </article>
+
+            <article class="kpi">
+                <div class="kpi-top">
+                    <span class="kpi-label">Sales Records</span>
+                    <span class="kpi-icon icon-green">▤</span>
+                </div>
+
+                <div class="kpi-value" id="salesRecords">0</div>
+
+                <div class="kpi-description">
+                    Records available for analysis
+                </div>
+            </article>
+
+            <article class="kpi">
+                <div class="kpi-top">
+                    <span class="kpi-label">Model Status</span>
+                    <span class="kpi-icon icon-orange">✳</span>
+                </div>
+
+                <div class="kpi-value" style="font-size:23px">
+                    ML Ready
+                </div>
+
+                <div class="kpi-description">
+                    Prediction uses the trained model
+                </div>
+            </article>
+
+        </section>
+
+        <!-- CHART AND INSIGHTS -->
+        <section class="content-grid" id="forecast">
+
+            <article class="panel">
+
+                <div class="panel-header">
+                    <div>
+                        <div class="section-label">PERFORMANCE OVER TIME</div>
+                        <h2>Sales overview</h2>
+                        <p class="panel-subtitle">
+                            Explore sales trends from the available dataset.
+                        </p>
+                    </div>
+
+                    <select class="chart-select" id="chartType">
+                        <option value="line">Trend View</option>
+                        <option value="bar">Bar View</option>
+                    </select>
+                </div>
+
+                <div class="legend">
+                    <span><i></i> Sales revenue</span>
+                    <span><i class="green-dot"></i> Trend indicator</span>
+                </div>
+
+                <div class="chart-area">
+                    <canvas id="salesChart"></canvas>
+                </div>
+
+                <div class="chart-footer">
+                    <span>● Dataset-driven analysis</span>
+                    <span id="chartInfo">Preparing chart...</span>
+                </div>
+
+            </article>
+
+            <article class="panel">
+
+                <div class="panel-header">
+                    <div>
+                        <div class="section-label">BUSINESS OVERVIEW</div>
+                        <h2>Key insights</h2>
+                        <p class="panel-subtitle">
+                            Important things to review.
+                        </p>
+                    </div>
+
+                    <span class="insight-tag">Insights</span>
+                </div>
+
+                <div class="insight-feature">
+                    <div class="insight-symbol">↗</div>
+
+                    <div>
+                        <strong id="insightTitle">Analyze your sales</strong>
+                        <p id="insightText">
+                            Load a dataset to review your sales performance.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="insight-row">
+                    <div class="insight-symbol">▥</div>
+
+                    <div>
+                        <strong>Understand sales trends</strong>
+                        <p>
+                            Compare sales across reporting periods to identify patterns.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="insight-row">
+                    <div class="insight-symbol">✓</div>
+
+                    <div>
+                        <strong>Plan inventory better</strong>
+                        <p>
+                            Review stock levels and expected demand before reordering.
+                        </p>
+                    </div>
+                </div>
+
+                <a href="#prediction" class="text-link">
+                    Estimate future sales <span>→</span>
+                </a>
+
+            </article>
+
+        </section>
+
+        <!-- PREDICTION AND DATASET -->
+        <section class="bottom-grid">
+
+            <article class="panel" id="prediction">
+
+                <div class="panel-header">
+
+                    <div>
+                        <div class="section-label">MACHINE LEARNING</div>
+                        <h2>Sales prediction</h2>
+                        <p class="panel-subtitle">
+                            Enter the sales details to generate a model estimate.
+                        </p>
+                    </div>
+
+                    <span class="model-badge">
+                        <i></i> Prediction tool
+                    </span>
+
+                </div>
+
+                <form id="predictionForm" class="form-grid">
+
+                    <div class="field">
+                        <label for="price">Product Price (₹)</label>
+                        <div class="input-box">
+                            <span>₹</span>
+                            <input
+                                type="number"
+                                id="price"
+                                value="1000"
+                                min="0.01"
+                                step="any"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="units">Expected Units Sold</label>
+                        <div class="input-box">
+                            <span>▦</span>
+                            <input
+                                type="number"
+                                id="units"
+                                value="10"
+                                min="0"
+                                step="any"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="discount">Discount (%)</label>
+                        <div class="input-box">
+                            <span>%</span>
+                            <input
+                                type="number"
+                                id="discount"
+                                value="5"
+                                min="0"
+                                max="100"
+                                step="any"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="marketing">Marketing Spend</label>
+                        <div class="input-box">
+                            <span>₹</span>
+                            <input
+                                type="number"
+                                id="marketing"
+                                value="100"
+                                min="0"
+                                step="any"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="month">Sales Month</label>
+                        <div class="input-box">
+                            <select id="month">
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="day">Day of Month</label>
+                        <div class="input-box">
+                            <input
+                                type="number"
+                                id="day"
+                                value="1"
+                                min="1"
+                                max="31"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="day_of_week" value="0">
+
+                    <div class="form-actions">
+                        <button type="submit" class="primary-button">
+                            ✳ Predict Sales <span>→</span>
+                        </button>
+
+                        <span class="form-note">
+                            Uses the trained Python model
+                        </span>
+                    </div>
+
+                </form>
+
+                <div class="result-box" id="resultBox">
+                    <div class="result-icon">✳</div>
+
+                    <div>
+                        <small id="resultLabel">PREDICTION RESULT</small>
+                        <strong id="predictionResult">
+                            Enter values to get an estimate.
+                        </strong>
+                    </div>
+                </div>
+
+            </article>
+
+            <article class="panel">
+
+                <div class="panel-header">
+                    <div>
+                        <div class="section-label">DATA MANAGEMENT</div>
+                        <h2>Dataset summary</h2>
+                        <p class="panel-subtitle">
+                            Review the information behind your analysis.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="dataset-row">
+                    <div>
+                        <small>Dataset status</small>
+                        <strong>Retail sales records</strong>
+                    </div>
+
+                    <span class="status-pill">CSV</span>
+                </div>
+
+                <div class="dataset-row">
+                    <div>
+                        <small>Prediction target</small>
+                        <strong>Sales Revenue</strong>
+                    </div>
+
+                    <span class="insight-tag">Sales</span>
+                </div>
+
+                <div class="dataset-row">
+                    <div>
+                        <small>Analysis status</small>
+                        <strong>Ready to analyze</strong>
+                    </div>
+
+                    <span class="status-pill">Ready</span>
+                </div>
+
+                <div class="upload-box">
+                    <div class="upload-icon">⇧</div>
+
+                    <div>
+                        <strong>Import your dataset</strong>
+
+                        <p>
+                            Upload a retail sales CSV to validate its structure
+                            and prepare it for analysis.
+                        </p>
+
+                        <a href="/upload">Import dataset →</a>
+                    </div>
+                </div>
+
+                <button class="secondary-button" id="downloadCsv">
+                    ⇩ &nbsp; Export chart data
+                </button>
+
+            </article>
+
+        </section>
+
+        <footer class="footer">
+            <span>RetailIQ <strong>·</strong> Sales Intelligence</span>
+            <span>Retail performance dashboard</span>
+        </footer>
+
+    </main>
+
+</div>
+
+<script>
+    const currency = value =>
+        new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 0
+        }).format(Number(value || 0));
+
+    const numberFormat = value =>
+        new Intl.NumberFormat("en-IN").format(Number(value || 0));
+
+    let salesRows = [];
+    let salesChart = null;
+
+    document.getElementById("reportDate").textContent =
+        new Date().toLocaleDateString("en-IN", {
+            month: "long",
+            year: "numeric"
+        });
+
+    function createChart(rows) {
+        const canvas = document.getElementById("salesChart");
+
+        if (salesChart) {
+            salesChart.destroy();
+        }
+
+        const labels = rows.map(item => item.period);
+        const values = rows.map(item => Number(item.sales || 0));
+
+        const ctx = canvas.getContext("2d");
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 270);
+        gradient.addColorStop(0, "rgba(155,140,255,0.30)");
+        gradient.addColorStop(1, "rgba(155,140,255,0)");
+
+        const chartType =
+            document.getElementById("chartType").value;
+
+        salesChart = new Chart(ctx, {
+            type: chartType,
+
+            data: {
+                labels: labels,
+
+                datasets: [{
+                    label: "Sales Revenue",
+                    data: values,
+
+                    borderColor: "#9b8cff",
+                    backgroundColor:
+                        chartType === "line" ? gradient : "#8271ed",
+
+                    fill: chartType === "line",
+                    tension: 0.4,
+                    borderWidth: 2.5,
+
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: "#b7aaff",
+
+                    borderRadius:
+                        chartType === "bar" ? 5 : 0
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        backgroundColor: "#151e33",
+                        borderColor: "#34405b",
+                        borderWidth: 1,
+                        padding: 12,
+
+                        callbacks: {
+                            label: context =>
+                                " Sales: " + currency(context.raw)
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+
+                        ticks: {
+                            color: "#8996b0",
+                            maxRotation: 0
+                        },
+
+                        border: {
+                            display: false
+                        }
+                    },
+
+                    y: {
+                        beginAtZero: true,
+
+                        grid: {
+                            color: "rgba(122,140,175,0.12)"
+                        },
+
+                        ticks: {
+                            color: "#8996b0",
+
+                            callback: value =>
+                                value >= 100000
+                                    ? "₹" + (value / 100000).toFixed(1) + "L"
+                                    : "₹" + numberFormat(value)
+                        },
+
+                        border: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    async function loadDashboard() {
+        try {
+            const response = await fetch("/api/dashboard");
+
+            if (!response.ok) {
+                throw new Error("Unable to load sales data.");
+            }
+
+            const data = await response.json();
+
+            salesRows = data.rows || [];
+
+            document.getElementById("totalSales").textContent =
+                currency(data.total_sales);
+
+            document.getElementById("averageSales").textContent =
+                currency(data.average_sales);
+
+            document.getElementById("salesRecords").textContent =
+                numberFormat(data.records);
+
+            document.getElementById("chartInfo").textContent =
+                numberFormat(data.records) + " records analyzed";
+
+            if (data.records > 0) {
+                document.getElementById("insightTitle").textContent =
+                    "Sales data analyzed";
+
+                document.getElementById("insightText").textContent =
+                    "Your dataset contains " +
+                    numberFormat(data.records) +
+                    " sales records, with an average sale value of " +
+                    currency(data.average_sales) + ".";
+            } else {
+                document.getElementById("insightTitle").textContent =
+                    "Import your sales data";
+
+                document.getElementById("insightText").textContent =
+                    "Load a dataset with historical sales records to display meaningful trends.";
+            }
+
+            createChart(salesRows);
+
+        } catch (error) {
+            document.getElementById("chartInfo").textContent =
+                "Dashboard data unavailable";
+
+            document.getElementById("insightTitle").textContent =
+                "Sales analytics";
+
+            document.getElementById("insightText").textContent =
+                "Connect your sales dataset to display live business insights.";
+
+            createChart([]);
+        }
+    }
+
+    document.getElementById("chartType").addEventListener(
+        "change",
+        () => createChart(salesRows)
+    );
+
+    // Send prediction request to Python Flask backend.
+    document.getElementById("predictionForm").addEventListener(
+        "submit",
+        async function(event) {
+            event.preventDefault();
+
+            const result = document.getElementById("predictionResult");
+            const resultLabel = document.getElementById("resultLabel");
+            const resultBox = document.getElementById("resultBox");
+
+            resultBox.classList.remove("error");
+            result.textContent = "Calculating prediction...";
+            resultLabel.textContent = "PLEASE WAIT";
+
+            const payload = {
+                price: Number(document.getElementById("price").value),
+                units: Number(document.getElementById("units").value),
+                discount: Number(document.getElementById("discount").value),
+                marketing: Number(document.getElementById("marketing").value),
+                month: Number(document.getElementById("month").value),
+                day: Number(document.getElementById("day").value),
+                day_of_week: Number(
+                    document.getElementById("day_of_week").value
+                )
+            };
+
+            try {
+                const response = await fetch("/predict", {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.error || "Prediction failed."
+                    );
+                }
+
+                resultLabel.textContent = "PREDICTED SALES ESTIMATE";
+
+                result.textContent = currency(data.predicted_sales);
+
+            } catch (error) {
+                resultBox.classList.add("error");
+
+                resultLabel.textContent = "PREDICTION UNAVAILABLE";
+
+                result.textContent =
+                    error.message ||
+                    "Please check the Python model and Flask server.";
+            }
+        }
+    );
+
+    // Export chart data as CSV.
+    document.getElementById("downloadCsv").addEventListener(
+        "click",
+        exportCsv
+    );
+
+    document.getElementById("exportButton").addEventListener(
+        "click",
+        exportCsv
+    );
+
+    function exportCsv() {
+        if (!salesRows.length) {
+            alert("No chart data is available to export yet.");
+            return;
+        }
+
+        const lines = [
+            "Period,Sales Revenue",
+
+            ...salesRows.map(row =>
+                '"' + String(row.period).replaceAll('"', '""') +
+                '",' + Number(row.sales || 0)
+            )
+        ];
+
+        const blob = new Blob(
+            [lines.join("\n")],
+            { type: "text/csv;charset=utf-8;" }
+        );
+
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+
+        anchor.href = url;
+        anchor.download = "retail_sales_summary.csv";
+        anchor.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("menuButton").addEventListener(
+        "click",
+        () => {
+            document.getElementById("sidebar").classList.toggle("open");
+        }
+    );
+
+    document.querySelectorAll(".nav a").forEach(link => {
+        link.addEventListener("click", () => {
+            document.querySelectorAll(".nav a").forEach(item => {
+                item.classList.remove("active");
+            });
+
+            link.classList.add("active");
+
+            if (window.innerWidth <= 900) {
+                document.getElementById("sidebar").classList.remove("open");
+            }
+        });
+    });
+
+    loadDashboard();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+Date,Store_ID,Category,Price,Units_Sold,Discount,Marketing_Spend,Sales
+2026-01-01,Store_1,Electronics,1000,10,5,100,9500
+2026-01-02,Store_1,Electronics,1200,12,10,150,12960
+2026-01-03,Store_2,Apparel,500,20,5,80,9500
+2026-01-04,Store_2,Grocery,100,50,0,50,5000
+2026-01-05,Store_3,Electronics,1500,8,10,200,10800
+2026-01-06,Store_1,Apparel,700,15,5,100,9975
+2026-01-07,Store_3,Grocery,120,40,5,60,4560
+2026-01-08,Store_2,Electronics,2000,5,15,250,8500
+2026-01-09,Store_1,Grocery,150,30,0,40,4500
+2026-01-10,Store_3,Apparel,800,12,10,120,8640

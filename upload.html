@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Upload Retail Dataset</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<header>
+    <h1>Upload Retail Dataset</h1>
+    <p>Validate your retail sales CSV file</p>
+</header>
+
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/inventory">Inventory</a>
+    <a href="/models">ML Models</a>
+    <a href="/upload">Upload Dataset</a>
+</nav>
+
+<main>
+
+    <section class="panel">
+        <h2>Choose CSV File</h2>
+
+        <form id="upload-form">
+            <input type="file"
+                   id="dataset"
+                   accept=".csv"
+                   required>
+
+            <button type="submit">Upload and Validate</button>
+        </form>
+
+        <div id="upload-result" class="result">
+            Select a CSV file to begin.
+        </div>
+    </section>
+
+</main>
+
+<script>
+const uploadForm = document.getElementById("upload-form");
+const uploadResult = document.getElementById("upload-result");
+
+uploadForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const fileInput = document.getElementById("dataset");
+
+    if (!fileInput.files.length) {
+        uploadResult.textContent = "Please select a CSV file.";
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    uploadResult.textContent = "Validating dataset...";
+
+    try {
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Upload failed.");
+        }
+
+        uploadResult.textContent =
+            data.message + " Total rows: " + data.rows;
+
+    } catch (error) {
+        uploadResult.textContent = error.message;
+    }
+});
+</script>
+
+</body>
+</html>
